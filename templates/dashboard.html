@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SolBridgeX Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1E88E5;
+            --primary-light: #42A5F5;
+            --primary-dark: #1565C0;
+            --secondary: #FFC107;
+            --secondary-light: #FFD54F;
+            --secondary-dark: #FFA000;
+            --dark: #0A0A14;
+            --darker: #06060E;
+            --gray: #252535;
+            --light-gray: #45455A;
+            --text: #E6E6E6;
+            --text-secondary: #AAAABC;
+            --success: #4CAF50;
+            --error: #F44336;
+            --warning: #FF9800;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--darker);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--primary-light);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 20px rgba(30, 136, 229, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(30, 136, 229, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--darker);
+            box-shadow: 0 4px 20px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: var(--secondary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 193, 7, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--gray);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #43A047;
+            transform: translateY(-2px);
+        }
+
+        .btn-error {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn-error:hover {
+            background: #E53935;
+            transform: translateY(-2px);
+        }
+
+        /* Header */
+        .header {
+            background: var(--dark);
+            border-bottom: 1px solid var(--gray);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        .logo-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wallet-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .wallet-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .wallet-status.connected {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+
+        .wallet-status.disconnected {
+            background: rgba(244, 67, 54, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(244, 67, 54, 0.2);
+        }
+
+        .wallet-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .wallet-status.connected .wallet-status-dot {
+            background: var(--success);
+        }
+
+        .wallet-status.disconnected .wallet-status-dot {
+            background: var(--error);
+        }
+
+        .wallet-address {
+            background: var(--gray);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .wallet-balance {
+            background: rgba(255, 193, 7, 0.1);
+            color: var(--secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid rgba(255, 193, 7, 0.2);
+        }
+
+        .wallet-balance-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Main Content */
+        .main {
+            padding: 2rem 0;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--gray);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            position: relative;
+            color: var(--text-secondary);
+        }
+
+        .tab:hover {
+            color: var(--text);
+        }
+
+        .tab.active {
+            color: var(--primary);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Settings Tab */
+        .settings-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+        }
+
+        .profile-section {
+            background: var(--dark);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid var(--gray);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: var(--gray);
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-picture img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-picture-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .profile-picture:hover .profile-picture-overlay {
+            opacity: 1;
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-wallet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            word-break: break-all;
+        }
+
+        .details-section {
+            background: var(--dark);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid var(--gray);
+        }
+
+        .details-section h3 {
+            margin-bottom: 1.5rem;
+            color: var(--text);
+            font-size: 1.25rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--gray);
+            background: var(--darker);
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.2);
+        }
+
+        .form-control:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        /* My Nodes Tab */
+        .nodes-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .node-card {
+            background: var(--dark);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--gray);
+            transition: all 0.3s ease;
+        }
+
+        .node-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary);
+        }
+
+        .node-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .node-name {
+            font-size: 1.25rem;
+            margin-bottom: 0;
+        }
+
+        .node-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .node-status.running {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+
+        .node-status.not-running {
+            background: rgba(244, 67, 54, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(244, 67, 54, 0.2);
+        }
+
+        .node-details {
+            margin-bottom: 1.5rem;
+        }
+
+        .node-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .node-detail-label {
+            color: var(--text-secondary);
+        }
+
+        .node-detail-value {
+            font-weight: 500;
+        }
+
+        .node-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Make Payment Tab */
+        .payment-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .qr-section {
+            background: var(--dark);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid var(--gray);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .qr-container {
+            width: 250px;
+            height: 250px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .qr-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--darker);
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .qr-placeholder svg {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .qr-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .qr-result {
+            width: 100%;
+            padding: 1rem;
+            background: var(--gray);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .qr-result.active {
+            display: block;
+        }
+
+        .manual-section {
+            background: var(--dark);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid var(--gray);
+        }
+
+        .payment-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-header-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .payment-header-text h3 {
+            margin-bottom: 0.25rem;
+        }
+
+        .payment-header-text p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .amount-input {
+            position: relative;
+        }
+
+        .amount-input .form-control {
+            padding-left: 3rem;
+            font-size: 1.5rem;
+            height: 60px;
+        }
+
+        .amount-input::before {
+            content: '₹';
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .payment-methods {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .payment-method {
+            flex: 1;
+            min-width: 100px;
+            background: var(--gray);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .payment-method:hover {
+            background: var(--light-gray);
+        }
+
+        .payment-method.active {
+            border-color: var(--primary);
+            background: rgba(30, 136, 229, 0.1);
+        }
+
+        .payment-method-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .payment-method-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .recent-contacts {
+            margin: 1.5rem 0;
+        }
+
+        .recent-contacts h4 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .contacts-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .contact {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .contact-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gray);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .contact-name {
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .settings-container,
+            .payment-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .wallet-info {
+                display: none;
+            }
+
+            .wallet-info-mobile {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                margin-top: 1rem;
+            }
+
+            .wallet-info-mobile .wallet-status,
+            .wallet-info-mobile .wallet-address,
+            .wallet-info-mobile .wallet-balance {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .logo {
+                margin-bottom: 0.5rem;
+            }
+
+            .tabs {
+                margin-top: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .nodes-container {
+                grid-template-columns: 1fr;
+            }
+
+            .tab {
+                padding: 1rem;
+            }
+        }
+
+        /* Utility Classes */
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mt-3 { margin-top: 1.5rem; }
+        .mt-4 { margin-top: 2rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+        .mb-4 { margin-bottom: 2rem; }
+        .text-center { text-align: center; }
+        .d-none { display: none; }
+        .d-flex { display: flex; }
+        .align-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-1 { gap: 0.5rem; }
+        .gap-2 { gap: 1rem; }
+        .w-100 { width: 100%; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <a href="#" class="logo">
+                <div class="logo-icon">S</div>
+                Sol<span>BridgeX</span>
+            </a>
+            <div class="wallet-info">
+                <div class="wallet-status connected">
+                    <span class="wallet-status-dot"></span>
+                    Connected
+                </div>
+                <div class="wallet-address">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 7H5C3.89543 7 3 7.89543 3 9V18C3 19.1046 3.89543 20 5 20H19C20.1046 20 21 19.1046 21 18V9C21 7.89543 20.1046 7 19 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16 14C16 15.1046 15.1046 16 14 16C12.8954 16 12 15.1046 12 14C12 12.8954 12.8954 12 14 12C15.1046 12 16 12.8954 16 14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M7 7V5C7 3.89543 7.89543 3 9 3H15C16.1046 3 17 3.89543 17 5V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    7XYZ...ABC
+                </div>
+                <div class="wallet-balance">
+                    <svg class="wallet-balance-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M15 9.5C14.315 8.815 13.109 8.339 12 8.5C10.44 8.725 9.5 10.037 9.5 11.5C9.5 12.963 10.5 14.275 12 14.5C13.5 14.725 14.5 16.037 14.5 17.5C14.5 18.963 13.56 20.275 12 20.5C10.891 20.661 9.685 20.185 9 19.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 8.5V6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 20.5V22.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    5.23 SOL
+                </div>
+            </div>
+            <div class="wallet-info-mobile d-none">
+                <div class="wallet-status connected">
+                    <span class="wallet-status-dot"></span>
+                    Connected
+                </div>
+                <div class="wallet-address">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 7H5C3.89543 7 3 7.89543 3 9V18C3 19.1046 3.89543 20 5 20H19C20.1046 20 21 19.1046 21 18V9C21 7.89543 20.1046 7 19 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16 14C16 15.1046 15.1046 16 14 16C12.8954 16 12 15.1046 12 14C12 12.8954 12.8954 12 14 12C15.1046 12 16 12.8954 16 14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M7 7V5C7 3.89543 7.89543 3 9 3H15C16.1046 3 17 3.89543 17 5V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    7XYZ...ABC
+                </div>
+                <div class="wallet-balance">
+                    <svg class="wallet-balance-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M15 9.5C14.315 8.815 13.109 8.339 12 8.5C10.44 8.725 9.5 10.037 9.5 11.5C9.5 12.963 10.5 14.275 12 14.5C13.5 14.725 14.5 16.037 14.5 17.5C14.5 18.963 13.56 20.275 12 20.5C10.891 20.661 9.685 20.185 9 19.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 8.5V6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 20.5V22.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    5.23 SOL
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="tabs">
+                <div class="tab" data-tab="nodes">My Nodes</div>
+                <div class="tab" data-tab="payment">Make Payment</div>
+            </div>
+
+            
+
+            <!-- My Nodes Tab -->
+            <div class="tab-content" id="nodes">
+                <div class="nodes-container">
+                    <div class="node-card">
+                        <div class="node-header">
+                            <h3 class="node-name">Node #1</h3>
+                            <div class="node-status running">Running</div>
+                        </div>
+                        <div class="node-details">
+                            <div class="node-detail">
+                                <span class="node-detail-label">Node ID:</span>
+                                <span class="node-detail-value">node_123456</span>
+                            </div>
+                            <div class="node-detail">
+                                <span class="node-detail-label">IP Address:</span>
+                                <span class="node-detail-value">192.168.1.100</span>
+                            </div>
+                            <div class="node-detail">
+                                <span class="node-detail-label">Uptime:</span>
+                                <span class="node-detail-value">14 days, 6 hours</span>
+                            </div>
+                            <div class="node-detail">
+                                <span class="node-detail-label">Transactions:</span>
+                                <span class="node-detail-value">1,245</span>
+                            </div>
+                            <div class="node-detail">
+                                <span class="node-detail-label">Status:</span>
+                                <span class="node-detail-value">Healthy</span>
+                            </div>
+                        </div>
+                        <div class="node-actions">
+                            <button class="btn btn-outline">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M19.4 15C19.2669 15.3016 19.2272 15.6362 19.286 15.9606C19.3448 16.285 19.4995 16.5843 19.73 16.82L19.79 16.88C19.976 17.0657 20.1235 17.2863 20.2241 17.5291C20.3248 17.7719 20.3766 18.0322 20.3766 18.295C20.3766 18.5578 20.3248 18.8181 20.2241 19.0609C20.1235 19.3037 19.976 19.5243 19.79 19.71C19.6043 19.896 19.3837 20.0435 19.1409 20.1441C18.8981 20.2448 18.6378 20.2966 18.375 20.2966C18.1122 20.2966 17.8519 20.2448 17.6091 20.1441C17.3663 20.0435 17.1457 19.896 16.96 19.71L16.9 19.65C16.6643 19.4195 16.365 19.2648 16.0406 19.206C15.7162 19.1472 15.3816 19.1869 15.08 19.32C14.7842 19.4468 14.532 19.6572 14.3543 19.9255C14.1766 20.1938 14.0813 20.5082 14.08 20.83V21C14.08 21.5304 13.8693 22.0391 13.4942 22.4142C13.1191 22.7893 12.6104 23 12.08 23C11.5496 23 11.0409 22.7893 10.6658 22.4142C10.2907 22.0391 10.08 21.5304 10.08 21V20.91C10.0723 20.579 9.96512 20.258 9.77251 19.9887C9.5799 19.7194 9.31074 19.5143 9 19.4C8.69838 19.2669 8.36381 19.2272 8.03941 19.286C7.71502 19.3448 7.41568 19.4995 7.18 19.73L7.12 19.79C6.93425 19.976 6.71368 20.1235 6.47088 20.2241C6.22808 20.3248 5.96783 20.3766 5.705 20.3766C5.44217 20.3766 5.18192 20.3248 4.93912 20.2241C4.69632 20.1235 4.47575 19.976 4.29 19.79C4.10405 19.6043 3.95653 19.3837 3.85588 19.1409C3.75523 18.8981 3.70343 18.6378 3.70343 18.375C3.70343 18.1122 3.75523 17.8519 3.85588 17.6091C3.95653 17.3663 4.10405 17.1457 4.29 16.96L4.35 16.9C4.58054 16.6643 4.73519 16.365 4.794 16.0406C4.85282 15.7162 4.81312 15.3816 4.68 15.08C4.55324 14.7842 4.34276 14.532 4.07447 14.3543C3.80618 14.1766 3.49179 14.0813 3.17 14.08H3C2.46957 14.08 1.96086 13.8693 1.58579 13.4942C1.21071 13.1191 1 12.6104 1 12.08C1 11.5496 1.21071 11.0409 1.58579 10.6658C1.96086 10.2907 2.46957 10.08 3 10.08H3.09C3.42099 10.0723 3.742 9.96512 4.0113 9.77251C4.28059 9.5799 4.48572 9.31074 4.6 9C4.73312 8.69838 4.77282 8.36381 4.714 8.03941C4.65519 7.71502 4.50054 7.41568 4.27 7.18L4.21 7.12C4.02405 6.93425 3.87653 6.71368 3.77588 6.47088C3.67523 6.22808 3.62343 5.96783 3.62343 5.705C3.62343 5.44217 3.67523 5.18192 3.77588 4.93912C3.87653 4.69632 4.02405 4.47575 4.21 4.29C4.39575 4.10405 4.61632 3.95653 4.85912 3.85588C5.10192 3.75523 5.36217 3.70343 5.625 3.70343C5.88783 3.70343 6.14808 3.75523 6.39088 3.85588C6.63368 3.95653 6.85425 4.10405 7.04 4.29L7.1 4.35C7.33568 4.58054 7.63502 4.73519 7.95941 4.794C8.28381 4.85282 8.61838 4.81312 8.92 4.68H9C9.29577 4.55324 9.54802 4.34276 9.72569 4.07447C9.90337 3.80618 9.99872 3.49179 10 3.17V3C10 2.46957 10.2107 1.96086 10.5858 1.58579C10.9609 1.21071 11.4696 1 12 1C12.5304 1 13.0391 1.21071 13.4142 1.58579C13.7893 1.96086 14 2.46957 14 3V3.09C14.0013 3.41179 14.0966 3.72618 14.2743 3.99447C14.452 4.26276 14.7042 4.47324 15 4.6C15.3016 4.73312 15.6362 4.77282 15.9606 4.714C16.285 4.65519 16.5843 4.50054 16.82 4.27L16.88 4.21C17.0657 4.02405 17.2863 3.87653 17.5291 3.77588C17.7719 3.67523 18.0322 3.62343 18.295 3.62343C18.5578 3.62343 18.8181 3.67523 19.0609 3.77588C19.3037 3.87653 19.5243 4.02405 19.71 4.21C19.896 4.39575 20.0435 4.61632 20.1441 4.85912C20.2448 5.10192 20.2966 5.36217 20.2966 5.625C20.2966 5.88783 20.2448 6.14808 20.1441 6.39088C20.0435 6.63368 19.896 6.85425 19.71 7.04L19.65 7.1C19.4195 7.33568 19.2648 7.63502 19.206 7.95941C19.1472 8.28381 19.1869 8.61838 19.32 8.92V9C19.4468 9.29577 19.6572 9.54802 19.9255 9.72569C20.1938 9.90337 20.5082 9.99872 20.83 10H21C21.5304 10 22.0391 10.2107 22.4142 10.5858C22.7893 10.9609 23 11.4696 23 12C23 12.5304 22.7893 13.0391 22.4142 13.4142C22.0391 13.7893 21.5304 14 21 14H20.91C20.5882 14.0013 20.2738 14.0966 20.0055 14.2743C19.7372 14.452 19.5268 14.7042 19.4 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Manage
+                            </button>
+                            <button class="btn btn-error">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Stop
+                            </button>
+                        </div>
+                    </div>
+                    <div class="node-card">
+                        <div class="node-header">
+                            <h3 class="node-name">Node #2</h3>
+                            <div class="node-status not-running">Not Running</div>
+                        </div>
+                        <div class="node-details">
+                            <div class="node-detail">
+                                <span class="node-detail-label">Node ID:</span>
+                                <span class="node-detail-value">node_789012</span>
+                            </div>
+                            <div class="node-detail">
+                                <span class="node-detail-label">IP Address:</span>
+                                <span class="node-detail-value">192.168.1.101</span>
+                            </div>
+                            <div class="node-detail">
+                                <span class="node-detail-label">Uptime:</span>
+                                <span class="node-detail-value">0 days, 0 hours</span>
+                            </div>
+                            <div class="node-detail">
+                                <span class="node-detail-label">Transactions:</span>
+                                <span class="node-detail-value">0</span>
+                            </div>
+                            <div class="node-detail">
+                                <span class="node-detail-label">Status:</span>
+                                <span class="node-detail-value">Offline</span>
+                            </div>
+                        </div>
+                        <div class="node-actions">
+                            <button class="btn btn-outline">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M19.4 15C19.2669 15.3016 19.2272 15.6362 19.286 15.9606C19.3448 16.285 19.4995 16.5843 19.73 16.82L19.79 16.88C19.976 17.0657 20.1235 17.2863 20.2241 17.5291C20.3248 17.7719 20.3766 18.0322 20.3766 18.295C20.3766 18.5578 20.3248 18.8181 20.2241 19.0609C20.1235 19.3037 19.976 19.5243 19.79 19.71C19.6043 19.896 19.3837 20.0435 19.1409 20.1441C18.8981 20.2448 18.6378 20.2966 18.375 20.2966C18.1122 20.2966 17.8519 20.2448 17.6091 20.1441C17.3663 20.0435 17.1457 19.896 16.96 19.71L16.9 19.65C16.6643 19.4195 16.365 19.2648 16.0406 19.206C15.7162 19.1472 15.3816 19.1869 15.08 19.32C14.7842 19.4468 14.532 19.6572 14.3543 19.9255C14.1766 20.1938 14.0813 20.5082 14.08 20.83V21C14.08 21.5304 13.8693 22.0391 13.4942 22.4142C13.1191 22.7893 12.6104 23 12.08 23C11.5496 23 11.0409 22.7893 10.6658 22.4142C10.2907 22.0391 10.08 21.5304 10.08 21V20.91C10.0723 20.579 9.96512 20.258 9.77251 19.9887C9.5799 19.7194 9.31074 19.5143 9 19.4C8.69838 19.2669 8.36381 19.2272 8.03941 19.286C7.71502 19.3448 7.41568 19.4995 7.18 19.73L7.12 19.79C6.93425 19.976 6.71368 20.1235 6.47088 20.2241C6.22808 20.3248 5.96783 20.3766 5.705 20.3766C5.44217 20.3766 5.18192 20.3248 4.93912 20.2241C4.69632 20.1235 4.47575 19.976 4.29 19.79C4.10405 19.6043 3.95653 19.3837 3.85588 19.1409C3.75523 18.8981 3.70343 18.6378 3.70343 18.375C3.70343 18.1122 3.75523 17.8519 3.85588 17.6091C3.95653 17.3663 4.10405 17.1457 4.29 16.96L4.35 16.9C4.58054 16.6643 4.73519 16.365 4.794 16.0406C4.85282 15.7162 4.81312 15.3816 4.68 15.08C4.55324 14.7842 4.34276 14.532 4.07447 14.3543C3.80618 14.1766 3.49179 14.0813 3.17 14.08H3C2.46957 14.08 1.96086 13.8693 1.58579 13.4942C1.21071 13.1191 1 12.6104 1 12.08C1 11.5496 1.21071 11.0409 1.58579 10.6658C1.96086 10.2907 2.46957 10.08 3 10.08H3.09C3.42099 10.0723 3.742 9.96512 4.0113 9.77251C4.28059 9.5799 4.48572 9.31074 4.6 9C4.73312 8.69838 4.77282 8.36381 4.714 8.03941C4.65519 7.71502 4.50054 7.41568 4.27 7.18L4.21 7.12C4.02405 6.93425 3.87653 6.71368 3.77588 6.47088C3.67523 6.22808 3.62343 5.96783 3.62343 5.705C3.62343 5.44217 3.67523 5.18192 3.77588 4.93912C3.87653 4.69632 4.02405 4.47575 4.21 4.29C4.39575 4.10405 4.61632 3.95653 4.85912 3.85588C5.10192 3.75523 5.36217 3.70343 5.625 3.70343C5.88783 3.70343 6.14808 3.75523 6.39088 3.85588C6.63368 3.95653 6.85425 4.10405 7.04 4.29L7.1 4.35C7.33568 4.58054 7.63502 4.73519 7.95941 4.794C8.28381 4.85282 8.61838 4.81312 8.92 4.68H9C9.29577 4.55324 9.54802 4.34276 9.72569 4.07447C9.90337 3.80618 9.99872 3.49179 10 3.17V3C10 2.46957 10.2107 1.96086 10.5858 1.58579C10.9609 1.21071 11.4696 1 12 1C12.5304 1 13.0391 1.21071 13.4142 1.58579C13.7893 1.96086 14 2.46957 14 3V3.09C14.0013 3.41179 14.0966 3.72618 14.2743 3.99447C14.452 4.26276 14.7042 4.47324 15 4.6C15.3016 4.73312 15.6362 4.77282 15.9606 4.714C16.285 4.65519 16.5843 4.50054 16.82 4.27L16.88 4.21C17.0657 4.02405 17.2863 3.87653 17.5291 3.77588C17.7719 3.67523 18.0322 3.62343 18.295 3.62343C18.5578 3.62343 18.8181 3.67523 19.0609 3.77588C19.3037 3.87653 19.5243 4.02405 19.71 4.21C19.896 4.39575 20.0435 4.61632 20.1441 4.85912C20.2448 5.10192 20.2966 5.36217 20.2966 5.625C20.2966 5.88783 20.2448 6.14808 20.1441 6.39088C20.0435 6.63368 19.896 6.85425 19.71 7.04L19.65 7.1C19.4195 7.33568 19.2648 7.63502 19.206 7.95941C19.1472 8.28381 19.1869 8.61838 19.32 8.92V9C19.4468 9.29577 19.6572 9.54802 19.9255 9.72569C20.1938 9.90337 20.5082 9.99872 20.83 10H21C21.5304 10 22.0391 10.2107 22.4142 10.5858C22.7893 10.9609 23 11.4696 23 12C23 12.5304 22.7893 13.0391 22.4142 13.4142C22.0391 13.7893 21.5304 14 21 14H20.91C20.5882 14.0013 20.2738 14.0966 20.0055 14.2743C19.7372 14.452 19.5268 14.7042 19.4 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Manage
+                            </button>
+                            <button class="btn btn-success">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Start
+                            </button>
+                        </div>
+                    </div>
+                    <div class="node-card">
+                        <div class="node-header">
+                            <h3 class="node-name">Node #3</h3>
+                            <div class="node-status running">Running</div>
+                        </div>
+                        <div class="node-details">
+                            <div class="node-detail">
+                                <span class="node-detail-label">Node ID:</span>
+                                <span class="node-detail-value">node_345678</span>
+                            </div>
+                            <div class="node-detail">
+                                <span class="node-detail-label">IP Address:</span>
+                                <span class="node-detail-value">192.168.1.102</span>
+                            </div>
+                            <div class="node-detail">
+                                <span class="node-detail-label">Uptime:</span>
+                                <span class="node-detail-value">3 days, 12 hours</span>
+                            </div>
+                            <div class="node-detail">
+                                <span class="node-detail-label">Transactions:</span>
+                                <span class="node-detail-value">587</span>
+                            </div>
+                            <div class="node-detail">
+                                <span class="node-detail-label">Status:</span>
+                                <span class="node-detail-value">Healthy</span>
+                            </div>
+                        </div>
+                        <div class="node-actions">
+                            <button class="btn btn-outline">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M19.4 15C19.2669 15.3016 19.2272 15.6362 19.286 15.9606C19.3448 16.285 19.4995 16.5843 19.73 16.82L19.79 16.88C19.976 17.0657 20.1235 17.2863 20.2241 17.5291C20.3248 17.7719 20.3766 18.0322 20.3766 18.295C20.3766 18.5578 20.3248 18.8181 20.2241 19.0609C20.1235 19.3037 19.976 19.5243 19.79 19.71C19.6043 19.896 19.3837 20.0435 19.1409 20.1441C18.8981 20.2448 18.6378 20.2966 18.375 20.2966C18.1122 20.2966 17.8519 20.2448 17.6091 20.1441C17.3663 20.0435 17.1457 19.896 16.96 19.71L16.9 19.65C16.6643 19.4195 16.365 19.2648 16.0406 19.206C15.7162 19.1472 15.3816 19.1869 15.08 19.32C14.7842 19.4468 14.532 19.6572 14.3543 19.9255C14.1766 20.1938 14.0813 20.5082 14.08 20.83V21C14.08 21.5304 13.8693 22.0391 13.4942 22.4142C13.1191 22.7893 12.6104 23 12.08 23C11.5496 23 11.0409 22.7893 10.6658 22.4142C10.2907 22.0391 10.08 21.5304 10.08 21V20.91C10.0723 20.579 9.96512 20.258 9.77251 19.9887C9.5799 19.7194 9.31074 19.5143 9 19.4C8.69838 19.2669 8.36381 19.2272 8.03941 19.286C7.71502 19.3448 7.41568 19.4995 7.18 19.73L7.12 19.79C6.93425 19.976 6.71368 20.1235 6.47088 20.2241C6.22808 20.3248 5.96783 20.3766 5.705 20.3766C5.44217 20.3766 5.18192 20.3248 4.93912 20.2241C4.69632 20.1235 4.47575 19.976 4.29 19.79C4.10405 19.6043 3.95653 19.3837 3.85588 19.1409C3.75523 18.8981 3.70343 18.6378 3.70343 18.375C3.70343 18.1122 3.75523 17.8519 3.85588 17.6091C3.95653 17.3663 4.10405 17.1457 4.29 16.96L4.35 16.9C4.58054 16.6643 4.73519 16.365 4.794 16.0406C4.85282 15.7162 4.81312 15.3816 4.68 15.08C4.55324 14.7842 4.34276 14.532 4.07447 14.3543C3.80618 14.1766 3.49179 14.0813 3.17 14.08H3C2.46957 14.08 1.96086 13.8693 1.58579 13.4942C1.21071 13.1191 1 12.6104 1 12.08C1 11.5496 1.21071 11.0409 1.58579 10.6658C1.96086 10.2907 2.46957 10.08 3 10.08H3.09C3.42099 10.0723 3.742 9.96512 4.0113 9.77251C4.28059 9.5799 4.48572 9.31074 4.6 9C4.73312 8.69838 4.77282 8.36381 4.714 8.03941C4.65519 7.71502 4.50054 7.41568 4.27 7.18L4.21 7.12C4.02405 6.93425 3.87653 6.71368 3.77588 6.47088C3.67523 6.22808 3.62343 5.96783 3.62343 5.705C3.62343 5.44217 3.67523 5.18192 3.77588 4.93912C3.87653 4.69632 4.02405 4.47575 4.21 4.29C4.39575 4.10405 4.61632 3.95653 4.85912 3.85588C5.10192 3.75523 5.36217 3.70343 5.625 3.70343C5.88783 3.70343 6.14808 3.75523 6.39088 3.85588C6.63368 3.95653 6.85425 4.10405 7.04 4.29L7.1 4.35C7.33568 4.58054 7.63502 4.73519 7.95941 4.794C8.28381 4.85282 8.61838 4.81312 8.92 4.68H9C9.29577 4.55324 9.54802 4.34276 9.72569 4.07447C9.90337 3.80618 9.99872 3.49179 10 3.17V3C10 2.46957 10.2107 1.96086 10.5858 1.58579C10.9609 1.21071 11.4696 1 12 1C12.5304 1 13.0391 1.21071 13.4142 1.58579C13.7893 1.96086 14 2.46957 14 3V3.09C14.0013 3.41179 14.0966 3.72618 14.2743 3.99447C14.452 4.26276 14.7042 4.47324 15 4.6C15.3016 4.73312 15.6362 4.77282 15.9606 4.714C16.285 4.65519 16.5843 4.50054 16.82 4.27L16.88 4.21C17.0657 4.02405 17.2863 3.87653 17.5291 3.77588C17.7719 3.67523 18.0322 3.62343 18.295 3.62343C18.5578 3.62343 18.8181 3.67523 19.0609 3.77588C19.3037 3.87653 19.5243 4.02405 19.71 4.21C19.896 4.39575 20.0435 4.61632 20.1441 4.85912C20.2448 5.10192 20.2966 5.36217 20.2966 5.625C20.2966 5.88783 20.2448 6.14808 20.1441 6.39088C20.0435 6.63368 19.896 6.85425 19.71 7.04L19.65 7.1C19.4195 7.33568 19.2648 7.63502 19.206 7.95941C19.1472 8.28381 19.1869 8.61838 19.32 8.92V9C19.4468 9.29577 19.6572 9.54802 19.9255 9.72569C20.1938 9.90337 20.5082 9.99872 20.83 10H21C21.5304 10 22.0391 10.2107 22.4142 10.5858C22.7893 10.9609 23 11.4696 23 12C23 12.5304 22.7893 13.0391 22.4142 13.4142C22.0391 13.7893 21.5304 14 21 14H20.91C20.5882 14.0013 20.2738 14.0966 20.0055 14.2743C19.7372 14.452 19.5268 14.7042 19.4 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Manage
+                            </button>
+                            <button class="btn btn-error">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Stop
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <button class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 5V19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Add New Node
+                    </button>
+                </div>
+            </div>
+
+            <!-- Make Payment Tab -->
+            <div class="tab-content" id="payment">
+                <div class="payment-container">
+                    <div class="qr-section">
+                        <h3 class="mb-3">Scan QR Code</h3>
+                        <div class="qr-container">
+                            <div class="qr-placeholder" id="qr-placeholder">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M15 3H21V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M9 21H3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M21 15V21H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M3 9V3H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <p>Click to scan QR code</p>
+                            </div>
+                            <video id="qr-video" class="qr-video" playsinline></video>
+                        </div>
+                        <div class="qr-result" id="qr-result">
+                            <p>QR Code Result: <span id="qr-result-text"></span></p>
+                        </div>
+                        <button class="btn btn-primary" id="scan-qr">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V8C1 7.46957 1.21071 6.96086 1.58579 6.58579C1.96086 6.21071 2.46957 6 3 6H7L9 3H15L17 6H21C21.5304 6 22.0391 6.21071 22.4142 6.58579C22.7893 6.96086 23 7.46957 23 8V19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 17C14.2091 17 16 15.2091 16 13C16 10.7909 14.2091 9 12 9C9.79086 9 8 10.7909 8 13C8 15.2091 9.79086 17 12 17Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Scan QR Code
+                        </button>
+                    </div>
+                    <div class="manual-section">
+                        <div class="payment-header">
+                            <div class="payment-header-icon">₹</div>
+                            <div class="payment-header-text">
+                                <h3>Make a Payment</h3>
+                                <p>Send money to anyone with UPI</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="upi-id">UPI ID</label>
+                            <input type="text" id="upi-id" class="form-control" placeholder="example@upi">
+                        </div>
+                        <div class="form-group">
+                            <label for="amount">Amount</label>
+                            <div class="amount-input">
+                                <input type="number" id="amount" class="form-control" placeholder="0">
+                            </div>
+                        </div>
+                        <div class="payment-methods">
+                            <div class="payment-method active">
+                                <div class="payment-method-icon">🏦</div>
+                                <div class="payment-method-name">UPI</div>
+                            </div>
+                            <div class="payment-method">
+                                <div class="payment-method-icon">💳</div>
+                                <div class="payment-method-name">Card</div>
+                            </div>
+                            <div class="payment-method">
+                                <div class="payment-method-icon">💰</div>
+                                <div class="payment-method-name">Wallet</div>
+                            </div>
+                        </div>
+                        <div class="recent-contacts">
+                            <h4>Recent Contacts</h4>
+                            <div class="contacts-list">
+                                <div class="contact">
+                                    <div class="contact-avatar">A</div>
+                                    <div class="contact-name">Amit</div>
+                                </div>
+                                <div class="contact">
+                                    <div class="contact-avatar">P</div>
+                                    <div class="contact-name">Priya</div>
+                                </div>
+                                <div class="contact">
+                                    <div class="contact-avatar">S</div>
+                                    <div class="contact-name">Suresh</div>
+                                </div>
+                                <div class="contact">
+                                    <div class="contact-avatar">R</div>
+                                    <div class="contact-name">Ravi</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary w-100 mt-3">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Send Payment
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Tab Switching
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                // Remove active class from all tabs and contents
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Profile Picture Upload
+        const profilePicture = document.getElementById('profile-image');
+        const changePictureBtn = document.getElementById('change-picture');
+        const profilePictureInput = document.getElementById('profile-picture-input');
+
+        changePictureBtn.addEventListener('click', () => {
+            profilePictureInput.click();
+        });
+
+        profilePictureInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    profilePicture.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Form Handling
+        const profileForm = document.getElementById('profile-form');
+        const saveBtn = document.getElementById('save-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+
+        profileForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Simulate saving
+            alert('Profile updated successfully!');
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            // Reset form
+            profileForm.reset();
+        });
+
+        // QR Code Scanning
+        const scanQrBtn = document.getElementById('scan-qr');
+        const qrVideo = document.getElementById('qr-video');
+        const qrPlaceholder = document.getElementById('qr-placeholder');
+        const qrResult = document.getElementById('qr-result');
+        const qrResultText = document.getElementById('qr-result-text');
+        let scanning = false;
+
+        scanQrBtn.addEventListener('click', () => {
+            if (scanning) {
+                stopScanning();
+                return;
+            }
+            
+            startScanning();
+        });
+
+        function startScanning() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                    .then(function(stream) {
+                        qrVideo.srcObject = stream;
+                        qrVideo.style.display = 'block';
+                        qrPlaceholder.style.display = 'none';
+                        qrVideo.play();
+                        scanning = true;
+                        scanQrBtn.innerHTML = `
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Stop Scanning
+                        `;
+                        
+                        // Simulate QR code detection after 3 seconds
+                        setTimeout(() => {
+                            if (scanning) {
+                                const mockUpiId = 'rahul@okicici';
+                                qrResultText.textContent = mockUpiId;
+                                qrResult.classList.add('active');
+                                document.getElementById('upi-id').value = mockUpiId;
+                                stopScanning();
+                            }
+                        }, 3000);
+                    })
+                    .catch(function(error) {
+                        console.error('Error accessing camera:', error);
+                        alert('Could not access camera. Please check permissions.');
+                    });
+            } else {
+                alert('Your browser does not support camera access.');
+            }
+        }
+
+        function stopScanning() {
+            if (qrVideo.srcObject) {
+                qrVideo.srcObject.getTracks().forEach(track => track.stop());
+            }
+            qrVideo.style.display = 'none';
+            qrPlaceholder.style.display = 'flex';
+            scanning = false;
+            scanQrBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V8C1 7.46957 1.21071 6.96086 1.58579 6.58579C1.96086 6.21071 2.46957 6 3 6H7L9 3H15L17 6H21C21.5304 6 22.0391 6.21071 22.4142 6.58579C22.7893 6.96086 23 7.46957 23 8V19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 17C14.2091 17 16 15.2091 16 13C16 10.7909 14.2091 9 12 9C9.79086 9 8 10.7909 8 13C8 15.2091 9.79086 17 12 17Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Scan QR Code
+            `;
+        }
+
+        // Payment Methods
+        const paymentMethods = document.querySelectorAll('.payment-method');
+        
+        paymentMethods.forEach(method => {
+            method.addEventListener('click', () => {
+                paymentMethods.forEach(m => m.classList.remove('active'));
+                method.classList.add('active');
+            });
+        });
+
+        // Recent Contacts
+        const contacts = document.querySelectorAll('.contact');
+        
+        contacts.forEach(contact => {
+            contact.addEventListener('click', () => {
+                const contactName = contact.querySelector('.contact-name').textContent;
+                document.getElementById('upi-id').value = `${contactName.toLowerCase()}@upi`;
+            });
+        });
+
+        // Responsive Header
+        function checkScreenSize() {
+            const walletInfo = document.querySelector('.wallet-info');
+            const walletInfoMobile = document.querySelector('.wallet-info-mobile');
+            
+            if (window.innerWidth <= 768) {
+                walletInfo.style.display = 'none';
+                walletInfoMobile.classList.remove('d-none');
+                walletInfoMobile.style.display = 'flex';
+            } else {
+                walletInfo.style.display = 'flex';
+                walletInfoMobile.classList.add('d-none');
+            }
+        }
+
+        window.addEventListener('resize', checkScreenSize);
+        checkScreenSize();
+    </script>
+</body>
+</html>

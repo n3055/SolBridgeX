@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SolBridgeX - Node Management & Staking</title>
+    
+    <!-- Load all dependencies before any code -->
+    <script src="https://unpkg.com/@solana/web3.js@1.87.6/lib/index.iife.min.js"></script>
+    <script src="https://unpkg.com/@project-serum/anchor@0.26.0/dist/browser/anchor.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/buffer@6.0.3/index.js"></script>
+    <script>
+        console.log('Checking loaded libraries:');
+        console.log('solanaWeb3:', !!window.solanaWeb3);
+        console.log('anchor:', !!window.anchor);
+        console.log('buffer:', !!window.buffer);
+    </script>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .card {
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">SolBridgeX Dashboard</h1>
+        
+        <!-- Node Management Section -->
+        <div class="card">
+            <div class="card-header">
+                <h4>Node Management</h4>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label>Node ID:</label>
+                    <input type="text" id="nodeId" class="form-control" placeholder="Enter Node ID">
+                </div>
+                <button onclick="registerNode()" class="btn btn-primary">Register Node with Current Location</button>
+                <div class="form-check mt-3">
+                    <input type="checkbox" class="form-check-input" id="nodeActive">
+                    <label class="form-check-label">Node Active Status</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Staking Section -->
+        <div class="card">
+            <div class="card-header">
+                <h4>Staking Operations</h4>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label>Deposit Amount (SOL):</label>
+                    <input type="number" id="depositAmount" class="form-control" step="0.1">
+                </div>
+                <button onclick="depositSol()" class="btn btn-success">Deposit SOL</button>
+
+                <hr>
+
+                <div class="form-group">
+                    <label>Transfer Stake:</label>
+                    <input type="text" id="recipientAddress" class="form-control" placeholder="Recipient Address">
+                    <input type="number" id="transferAmount" class="form-control mt-2" step="0.1" placeholder="Amount in SOL">
+                    <input type="text" id="upiId" class="form-control mt-2" placeholder="UPI ID">
+                </div>
+                <button onclick="transferStake()" class="btn btn-primary">Transfer Stake</button>
+            </div>
+        </div>
+
+        <!-- Settlement Section -->
+        <div class="card">
+            <div class="card-header">
+                <h4>Settlement Operations</h4>
+            </div>
+            <div class="card-body">
+                <div id="pendingSettlements">
+                    <!-- Pending settlements will be displayed here -->
+                </div>
+                <button onclick="requestRefund()" class="btn btn-warning">Request Refund</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Make Buffer available globally
+        window.Buffer = buffer.Buffer;
+
+        // Global variables
+        let wallet = null;
+        let program = null;
+        let connection = null;
+        const PROGRAM_ID = '7sJhcJRzLxTqFEWCyFr6w4GQS4ghM8stRhXe1XXWpJQz';
+
+        async function initializeWallet() {
+            try {
+                if (!window.solana || !window.solana.isPhantom) {
+                    alert('Please install Phantom wallet!');
+                    return;
+                }
+
+                // Connect to wallet
+                await window.solana.connect();
+                wallet = window.solana;
+                console.log("Wallet connected:", wallet.publicKey.toString());
+
+                // Setup connection
+                connection = new solanaWeb3.Connection(
+                    solanaWeb3.clusterApiUrl('devnet'),
+                    'confirmed'
+                );
+
+                // Create the provider
+                const provider = {
+                    connection,
+                    wallet: {
+                        publicKey: wallet.publicKey,
+                        signTransaction: (tx) => wallet.signTransaction(tx),
+                        signAllTransactions: (txs) => wallet.signAllTransactions(txs),
+                    },
+                };
+
+                // Create program
+                const programId = new solanaWeb3.PublicKey(PROGRAM_ID);
+                program = new anchor.Program(idl, programId, provider);
+                
+                console.log('Program initialized successfully');
+                alert('Wallet connected successfully!');
+            } catch (err) {
+                console.error('Wallet initialization error:', err);
+                alert('Failed to connect wallet: ' + err.message);
+            }
+        }
+
+        // Add a function to check if wallet is connected
+        function checkWalletConnected() {
+            if (!wallet?.publicKey) {
+                alert('Please connect your wallet first!');
+                return false;
+            }
+            if (!program) {
+                alert('Program not initialized. Please refresh and try again.');
+                return false;
+            }
+            return true;
+        }
+
+        async function registerNode() {
+            if (!checkWalletConnected()) return;
+            
+            try {
+                if (!navigator.geolocation) {
+                    alert('Geolocation is not supported by your browser');
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const nodeId = document.getElementById('nodeId').value;
+                    if (!nodeId) {
+                        alert('Please enter a Node ID');
+                        return;
+                    }
+                    
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    try {
+                        // Derive the node PDA
+                        const [nodePda] = await solanaWeb3.PublicKey.findProgramAddress(
+                            [Buffer.from("node"), Buffer.from(nodeId)],
+                            program.programId
+                        );
+                        
+                        // Call register_node instruction
+                        const tx = await program.rpc.registerNode(
+                            nodeId,
+                            latitude,
+                            longitude,
+                            {
+                                accounts: {
+                                    node: nodePda,
+                                    owner: wallet.publicKey,
+                                    systemProgram: solanaWeb3.SystemProgram.programId,
+                                },
+                            }
+                        );
+                        
+                        console.log("Transaction signature:", tx);
+                        alert(`Node registered successfully at: ${latitude}, ${longitude}`);
+                    } catch (err) {
+                        console.error('Program call error:', err);
+                        alert('Failed to register node on-chain');
+                    }
+                });
+            } catch (err) {
+                console.error('Node registration error:', err);
+                alert('Failed to register node');
+            }
+        }
+
+        document.getElementById('nodeActive').addEventListener('change', async function() {
+            if (!checkWalletConnected()) return;
+            
+            try {
+                const active = this.checked;
+                const nodeId = document.getElementById('nodeId').value;
+                if (!nodeId) {
+                    alert('Please enter a Node ID');
+                    return;
+                }
+
+                // Derive the node PDA
+                const [nodePda] = await solanaWeb3.PublicKey.findProgramAddress(
+                    [Buffer.from("node"), Buffer.from(nodeId)],
+                    program.programId
+                );
+
+                // Call set_node_state instruction
+                const tx = await program.rpc.setNodeState(
+                    active,
+                    {
+                        accounts: {
+                            node: nodePda,
+                            owner: wallet.publicKey,
+                        },
+                    }
+                );
+
+                console.log("Transaction signature:", tx);
+                alert(`Node state updated to: ${active}`);
+            } catch (err) {
+                console.error('Node state update error:', err);
+                alert('Failed to update node state');
+            }
+        });
+
+        async function depositSol() {
+            console.log("Deposit initiated");
+            if (!checkWalletConnected()) return;
+            
+            try {
+                const amount = document.getElementById('depositAmount').value;
+                if (!amount || amount <= 0) {
+                    alert('Please enter a valid amount');
+                    return;
+                }
+
+                console.log("Processing deposit of", amount, "SOL");
+
+                // Convert SOL to lamports
+                const lamports = amount * solanaWeb3.LAMPORTS_PER_SOL;
+
+                // Derive the pool PDA
+                const [poolPda] = await solanaWeb3.PublicKey.findProgramAddress(
+                    [Buffer.from("pool")],
+                    program.programId
+                );
+
+                // Derive the stake account PDA
+                const [stakeAccountPda] = await solanaWeb3.PublicKey.findProgramAddress(
+                    [Buffer.from("stake"), wallet.publicKey.toBuffer()],
+                    program.programId
+                );
+
+                console.log("PDAs derived successfully");
+
+                // Call deposit_sol instruction
+                const tx = await program.rpc.depositSol(
+                    new anchor.BN(lamports),
+                    {
+                        accounts: {
+                            pool: poolPda,
+                            stakeAccount: stakeAccountPda,
+                            user: wallet.publicKey,
+                            systemProgram: solanaWeb3.SystemProgram.programId,
+                        },
+                    }
+                );
+
+                console.log("Transaction signature:", tx);
+                alert(`Successfully deposited ${amount} SOL`);
+            } catch (err) {
+                console.error('Deposit error:', err);
+                alert('Failed to deposit SOL: ' + err.message);
+            }
+        }
+
+        async function generateSignature(timestamp, upiId, amount) {
+            const message = `${timestamp}:${upiId}:${amount}`;
+            const encoder = new TextEncoder();
+            const data = encoder.encode(message);
+            // In a real implementation, you'd use a proper HMAC function
+            return await crypto.subtle.digest('SHA-256', data);
+        }
+
+        async function transferStake() {
+            if (!checkWalletConnected()) return;
+            
+            try {
+                const recipient = document.getElementById('recipientAddress').value;
+                const amount = document.getElementById('transferAmount').value;
+                const upiId = document.getElementById('upiId').value;
+
+                if (!recipient || !amount || !upiId) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+
+                // Convert SOL to lamports
+                const lamports = amount * solanaWeb3.LAMPORTS_PER_SOL;
+
+                // First, make the payment API call
+                const timestamp = Math.floor(Date.now() / 1000);
+                const signature = await generateSignature(timestamp, upiId, amount);
+                
+                const response = await fetch('http://127.0.0.1:4000/secure-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Signature': signature
+                    },
+                    body: JSON.stringify({
+                        upi_id: upiId,
+                        amt: amount,
+                        timestamp: timestamp
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    try {
+                        const recipientPubkey = new solanaWeb3.PublicKey(recipient);
+
+                        // Derive the from stake account PDA
+                        const [fromStakePda] = await solanaWeb3.PublicKey.findProgramAddress(
+                            [Buffer.from("stake"), wallet.publicKey.toBuffer()],
+                            program.programId
+                        );
+
+                        // Derive the to stake account PDA
+                        const [toStakePda] = await solanaWeb3.PublicKey.findProgramAddress(
+                            [Buffer.from("stake"), recipientPubkey.toBuffer()],
+                            program.programId
+                        );
+
+                        // Call transfer_stake instruction
+                        const tx = await program.rpc.transferStake(
+                            new anchor.BN(lamports),
+                            {
+                                accounts: {
+                                    fromStake: fromStakePda,
+                                    toStake: toStakePda,
+                                    from: wallet.publicKey,
+                                    to: recipientPubkey,
+                                },
+                            }
+                        );
+
+                        console.log("Transaction signature:", tx);
+                        alert('Stake transferred and settlement completed successfully');
+                    } catch (err) {
+                        console.error('On-chain transfer error:', err);
+                        alert('Payment succeeded but on-chain transfer failed');
+                    }
+                } else {
+                    alert('Payment failed');
+                }
+            } catch (err) {
+                console.error('Transfer error:', err);
+                alert('Failed to transfer stake');
+            }
+        }
+
+        async function requestRefund() {
+            if (!checkWalletConnected()) return;
+            
+            try {
+                // Derive the pool PDA
+                const [poolPda] = await solanaWeb3.PublicKey.findProgramAddress(
+                    [Buffer.from("pool")],
+                    program.programId
+                );
+
+                // Call request_stake_refund instruction
+                const tx = await program.rpc.requestStakeRefund({
+                    accounts: {
+                        transaction: transactionPda,
+                        pool: poolPda,
+                        payee: wallet.publicKey,
+                    },
+                });
+
+                console.log("Transaction signature:", tx);
+                alert('Refund requested successfully');
+            } catch (err) {
+                console.error('Refund request error:', err);
+                alert('Failed to request refund');
+            }
+        }
+
+        // Add IDL definition
+        const idl = {
+            "version": "0.1.0",
+            "name": "anchor_pool",
+            "instructions": [
+                {
+                    "name": "initializePool",
+                    "accounts": [
+                        {
+                            "name": "pool",
+                            "isMut": true,
+                            "isSigner": false
+                        },
+                        {
+                            "name": "payer",
+                            "isMut": true,
+                            "isSigner": true
+                        },
+                        {
+                            "name": "systemProgram",
+                            "isMut": false,
+                            "isSigner": false
+                        }
+                    ],
+                    "args": []
+                },
+                {
+                    "name": "depositSol",
+                    "accounts": [
+                        {
+                            "name": "pool",
+                            "isMut": true,
+                            "isSigner": false
+                        },
+                        {
+                            "name": "stakeAccount",
+                            "isMut": true,
+                            "isSigner": false
+                        },
+                        {
+                            "name": "user",
+                            "isMut": true,
+                            "isSigner": true
+                        },
+                        {
+                            "name": "systemProgram",
+                            "isMut": false,
+                            "isSigner": false
+                        }
+                    ],
+                    "args": [
+                        {
+                            "name": "amount",
+                            "type": "u64"
+                        }
+                    ]
+                },
+                {
+                    "name": "transferStake",
+                    "accounts": [
+                        {
+                            "name": "fromStake",
+                            "isMut": true,
+                            "isSigner": false
+                        },
+                        {
+                            "name": "toStake",
+                            "isMut": true,
+                            "isSigner": false
+                        },
+                        {
+                            "name": "from",
+                            "isMut": false,
+                            "isSigner": true
+                        },
+                        {
+                            "name": "to",
+                            "isMut": false,
+                            "isSigner": false
+                        }
+                    ],
+                    "args": [
+                        {
+                            "name": "amount",
+                            "type": "u64"
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await initializeWallet();
+                // Listen for wallet connection changes
+                window.solana?.on('connect', async () => {
+                    console.log("Wallet connected event detected");
+                    await initializeWallet();
+                });
+            } catch (error) {
+                console.error("Initialization error:", error);
+            }
+        });
+
+        // Make functions available globally
+        window.initializeWallet = initializeWallet;
+        window.depositSol = depositSol;
+        window.registerNode = registerNode;
+        window.transferStake = transferStake;
+        window.requestRefund = requestRefund;
+    </script>
+</body>
+</html> 

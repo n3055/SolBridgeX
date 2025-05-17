@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Solana UPI Payment</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f7f7f7; }
+        .container { max-width: 400px; margin: 40px auto; background: #fff; padding: 2em; border-radius: 8px; box-shadow: 0 2px 8px #0001; }
+        h2 { text-align: center; }
+        label { display: block; margin-top: 1em; }
+        input, button { width: 100%; padding: 0.7em; margin-top: 0.5em; border-radius: 4px; border: 1px solid #ccc; }
+        button { background: #512da8; color: #fff; border: none; cursor: pointer; }
+        button:disabled { background: #aaa; }
+        .status { margin-top: 1em; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Solana UPI Payment</h2>
+    <button id="connectWalletBtn">Connect Wallet</button>
+    <form id="paymentForm" style="display:none;">
+        <label for="upiId">UPI ID</label>
+        <input type="text" id="upiId" name="upiId" required>
+        <label for="amount">Amount (INR)</label>
+        <input type="number" id="amount" name="amount" required>
+        <button type="submit" id="payBtn">Pay</button>
+    </form>
+    <div class="status" id="status"></div>
+    <div class="status" id="txInfo"></div>
+</div>
+
+<script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
+<script>
+let wallet = null;
+let publicKey = null;
+let solAmount = 0;
+let transactionId = null;
+let secretKey = null;
+
+document.getElementById('connectWalletBtn').onclick = async function() {
+    if (window.solana && window.solana.isPhantom) {
+        try {
+            const resp = await window.solana.connect();
+            wallet = window.solana;
+            publicKey = resp.publicKey.toString();
+            document.getElementById('status').innerText = "Wallet connected: " + publicKey;
+            document.getElementById('paymentForm').style.display = 'block';
+            this.style.display = 'none';
+        } catch (err) {
+            document.getElementById('status').innerText = "Wallet connection failed.";
+        }
+    } else {
+        alert("Phantom wallet not found. Please install it.");
+    }
+};
+
+document.getElementById('paymentForm').onsubmit = async function(e) {
+    e.preventDefault();
+    const upiId = document.getElementById('upiId').value;
+    const amount = document.getElementById('amount').value;
+    document.getElementById('status').innerText = "Converting INR to SOL...";
+
+    // 1. Convert INR to SOL
+    const solPrice = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=inr')
+        .then(res => res.json())
+        .then(data => data.solana.inr);
+    solAmount = (amount / solPrice).toFixed(4);
+
+    document.getElementById('status').innerText = `Amount in SOL: ${solAmount}`;
+
+    // 2. Get user location
+    document.getElementById('status').innerText += "\nFetching your location...";
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+        const { latitude, longitude } = pos.coords;
+
+        // 3. Fetch all nodes from backend (Django view should return JSON list of nodes)
+        const nodes = await fetch('/api/nodes/').then(res => res.json());
+
+        // 4. Find nearest node
+        let minDist = Infinity, nearestNode = null;
+        for (const node of nodes) {
+            const dist = Math.sqrt(
+                Math.pow(node.latitude - latitude, 2) +
+                Math.pow(node.longitude - longitude, 2)
+            );
+            if (dist < minDist) {
+                minDist = dist;
+                nearestNode = node;
+            }
+        }
+        document.getElementById('status').innerText += `\nNearest node: ${nearestNode.node_id}`;
+
+        // 5. Transfer pool stake to node owner (call your Anchor program here)
+        // This requires a backend endpoint or direct JS interaction with Anchor/IDL
+        // For demo, we'll just simulate:
+        document.getElementById('status').innerText += "\nTransferring stake to node owner...";
+
+        // 6. Create transaction row (call your Anchor program here)
+        // Simulate transaction creation and get transactionId
+        transactionId = "TX" + Math.floor(Math.random() * 1000000);
+        document.getElementById('txInfo').innerText = "Transaction ID: " + transactionId;
+
+        // 7. Send API call to backend for payout
+        document.getElementById('status').innerText += "\nInitiating payout...";
+        // Simulate payout and secret key
+        setTimeout(() => {
+            secretKey = "SECRET" + Math.floor(Math.random() * 1000000);
+            document.getElementById('status').innerText += `\nPayout complete. Secret Key: ${secretKey}`;
+
+            // 8. Mark order as settled (call your Anchor program here)
+            // 9. If failed, allow refund after 15 min (simulate)
+        }, 2000);
+    }, (err) => {
+        document.getElementById('status').innerText = "Location access denied.";
+    });
+};
+</script>
+</body>
+</html>

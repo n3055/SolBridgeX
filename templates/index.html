@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SolBridgeX | P2P INR-SOL Exchange</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1E88E5;
+            --primary-light: #42A5F5;
+            --secondary: #d7a2ff;
+            --secondary-light: #FFD54F;
+            --dark: #0A0A14;
+            --darker: #06060E;
+            --gray: #252535;
+            --light-gray: #45455A;
+            --text: #E6E6E6;
+            --text-secondary: #AAAABC;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--darker);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+        }
+
+        h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+        }
+
+        h3 {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        a {
+            color: var(--secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--secondary-light);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 20px rgba(30, 136, 229, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(30, 136, 229, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 193, 7, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-wallet {
+            background: linear-gradient(135deg, var(--secondary), #F57C00);
+            color: var(--darker);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn-wallet:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+        }
+
+        .wallet-icon {
+            font-size: 1.2rem;
+        }
+
+        /* Header */
+        header {
+            padding: 1.5rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            transition: all 0.3s ease;
+            background: rgba(6, 6, 14, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        header.scrolled {
+            padding: 1rem 0;
+            background: rgba(6, 6, 14, 0.95);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        .logo-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: var(--text);
+            font-weight: 500;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--secondary);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 180px 0 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 70% 30%, rgba(30, 136, 229, 0.15), transparent 70%);
+            z-index: -1;
+        }
+
+        .hero-content {
+            max-width: 600px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 span {
+            color: var(--secondary);
+            position: relative;
+        }
+
+        .hero h1 span::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 193, 7, 0.2);
+            z-index: -1;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .hero-image {
+            position: absolute;
+            right: -5%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50%;
+            max-width: 600px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(-50%) translateX(0); }
+            50% { transform: translateY(-50%) translateX(-10px) translateY(-15px); }
+            100% { transform: translateY(-50%) translateX(0); }
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            padding: 100px 0;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: var(--secondary);
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .step-card {
+            background: var(--dark);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--gray);
+        }
+
+        .step-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary-light);
+        }
+
+        .step-number {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            font-size: 8rem;
+            font-weight: 800;
+            color: rgba(30, 136, 229, 0.1);
+            z-index: 0;
+        }
+
+        .step-icon {
+            font-size: 2.5rem;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-description {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 100px 0;
+            background: var(--dark);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .features::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 70%, rgba(255, 193, 7, 0.1), transparent 70%);
+            z-index: 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-card {
+            background: rgba(10, 10, 20, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            border: 1px solid var(--gray);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-color: var(--secondary);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Benefits Section */
+        .benefits {
+            padding: 100px 0;
+            position: relative;
+        }
+
+        .benefits-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .benefits-content {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .benefits-list {
+            margin-top: 2rem;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .benefit-icon {
+            margin-right: 1rem;
+            color: var(--secondary);
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .benefits-image {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .benefits-image img {
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Wallet Section */
+        .wallet-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, var(--dark), var(--darker));
+            border-top: 1px solid var(--gray);
+            border-bottom: 1px solid var(--gray);
+        }
+
+        .wallet-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+
+        .wallet-content {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .wallet-icons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            min-width: 300px;
+        }
+
+        .wallet-item {
+            background: var(--darker);
+            border: 1px solid var(--gray);
+            border-radius: 12px;
+            padding: 1.5rem;
+            width: calc(50% - 0.75rem);
+            min-width: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .wallet-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .wallet-item img {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 1rem;
+        }
+
+        .wallet-item p {
+            margin-bottom: 0;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 100px 0;
+            background: linear-gradient(135deg, var(--primary), #0D47A1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB4PSIwIiB5PSIwIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSgzMCkiPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIyIiBoZWlnaHQ9IjIiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==');
+            opacity: 0.1;
+        }
+
+        .cta-content {
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta h2 {
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 2rem;
+        }
+
+        .cta-form {
+            display: flex;
+            max-width: 500px;
+            margin: 0 auto;
+            gap: 1rem;
+        }
+
+        .cta-form input {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .cta-form input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .cta-form button {
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            border: none;
+            background: var(--secondary);
+            color: var(--darker);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cta-form button:hover {
+            background: white;
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--darker);
+            padding: 80px 0 30px;
+            position: relative;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            margin-bottom: 4rem;
+        }
+
+        .footer-logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: white;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .footer-logo span {
+            color: var(--secondary);
+        }
+
+        .footer-about p {
+            margin-bottom: 1.5rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .footer-links h4 {
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary);
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid var(--gray);
+            padding-top: 30px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Wallet Modal */
+        .wallet-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(6, 6, 14, 0.9);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .wallet-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .wallet-modal-content {
+            background: var(--dark);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid var(--gray);
+            position: relative;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .wallet-modal.active .wallet-modal-content {
+            transform: translateY(0);
+        }
+
+        .wallet-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .wallet-modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 0;
+        }
+
+        .wallet-modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .wallet-modal-close:hover {
+            color: var(--text);
+        }
+
+        .wallet-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .wallet-option {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: var(--darker);
+            border: 1px solid var(--gray);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .wallet-option:hover {
+            background: var(--gray);
+            transform: translateY(-2px);
+        }
+
+        .wallet-option img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .wallet-option-info {
+            flex: 1;
+        }
+
+        .wallet-option-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .wallet-option-description {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero-image {
+                width: 45%;
+                right: -10%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 150px 0 80px;
+            }
+
+            .hero-content {
+                max-width: 100%;
+                text-align: center;
+            }
+
+            .hero-btns {
+                justify-content: center;
+            }
+
+            .hero-stats {
+                justify-content: center;
+            }
+
+            .hero-image {
+                display: none;
+            }
+
+            .benefits-container {
+                flex-direction: column;
+            }
+
+            .benefits-image {
+                order: -1;
+            }
+
+            .cta-form {
+                flex-direction: column;
+            }
+
+            nav {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 70%;
+                height: 100vh;
+                background: var(--dark);
+                z-index: 100;
+                transition: all 0.3s ease;
+                padding: 6rem 2rem 2rem;
+            }
+
+            nav.active {
+                right: 0;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+                z-index: 101;
+            }
+
+            .mobile-menu-btn.active {
+                position: fixed;
+                right: 1.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero-stats {
+                flex-direction: column;
+                gap: 1.5rem;
+                align-items: center;
+            }
+
+            .stat-item {
+                align-items: center;
+            }
+
+            .wallet-item {
+                width: 100%;
+            }
+        }
+
+        /* Particle Animation */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(30, 136, 229, 0.2);
+            animation: float-particle 15s infinite linear;
+        }
+
+        @keyframes float-particle {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-1000px) translateX(100px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header id="header">
+        <div class="container header-container">
+            <a href="#" class="logo">
+                <div class="logo-icon">S</div>
+                Sol<span>BridgeX</span>
+            </a>
+            <nav id="nav">
+                <ul>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#benefits">Benefits</a></li>
+                    <li><a href="#wallet-section">Wallets</a></li>
+                </ul>
+            </nav>
+            <button class="btn-wallet" id="connect-wallet">
+                <span class="wallet-icon">💼</span>
+                Connect Wallet
+            </button>
+            <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="particles" id="particles"></div>
+        <div class="container">
+            <div class="hero-content">
+                <h1>Secure P2P <span>INR to SOL</span> Exchange Platform</h1>
+                <p>SolBridgeX enables direct peer-to-peer transactions between INR and SOL with encrypted node hosting for automatic payouts. No intermediaries, lower fees, maximum security.</p>
+                <div class="hero-btns">
+                    <button class="btn-wallet" id="connect-wallet-hero">
+                        <span class="wallet-icon">💼</span>
+                        Connect Wallet
+                    </button>
+                    <a href="#how-it-works" class="btn btn-secondary">Learn More</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">₹10M+</span>
+                        <span class="stat-label">Daily Volume</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">50K+</span>
+                        <span class="stat-label">Active Users</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">99.9%</span>
+                        <span class="stat-label">Uptime</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjYwMCIgdmlld0JveD0iMCAwIDYwMCA2MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGNpcmNsZSBjeD0iMzAwIiBjeT0iMzAwIiByPSIyNTAiIGZpbGw9InVybCgjcGFpbnQwX3JhZGlhbCkiLz4KICA8cGF0aCBkPSJNMzAwIDE1MEMyMTcuMTU3IDE1MCAxNTAgMjE3LjE1NyAxNTAgMzAwQzE1MCAzODIuODQzIDIxNy4xNTcgNDUwIDMwMCA0NTBDMzgyLjg0MyA0NTAgNDUwIDM4Mi44NDMgNDUwIDMwMEM0NTAgMjE3LjE1NyAzODIuODQzIDE1MCAzMDAgMTUwWk0yNTAgMzUwTDIwMCAyNTBMMzAwIDIwMEw0MDAgMzAwTDMwMCA0MDBMMjUwIDM1MFoiIGZpbGw9IiMxRTg4RTUiIGZpbGwtb3BhY2l0eT0iMC4yIi8+CiAgPHBhdGggZD0iTTMwMCAxNzVDMjMwLjk2NCAxNzUgMTc1IDIzMC45NjQgMTc1IDMwMEMxNzUgMzY5LjAzNiAyMzAuOTY0IDQyNSAzMDAgNDI1QzM2OS4wMzYgNDI1IDQyNSAzNjkuMDM2IDQyNSAzMDBDNDI1IDIzMC45NjQgMzY5LjAzNiAxNzUgMzAwIDE3NVpNMjYwIDM0MEwyMjAgMjYwTDMwMCAyMjBMMzgwIDMwMEwzMDAgMzgwTDI2MCAzNDBaIiBmaWxsPSIjRkZDMTA3IiBmaWxsLW9wYWNpdHk9IjAuMiIvPgogIDxkZWZzPgogICAgPHJhZGlhbEdyYWRpZW50IGlkPSJwYWludDBfcmFkaWFsIiBjeD0iMCIgY3k9IjAiIHI9IjEiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiBncmFkaWVudFRyYW5zZm9ybT0idHJhbnNsYXRlKDMwMCAzMDApIHJvdGF0ZSg5MCkgc2NhbGUoMzAwKSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiMwQTBBMTQiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMEEwQTE0IiBzdG9wLW9wYWNpdHk9IjAiLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgPC9kZWZzPgo8L3N2Zz4K" alt="Solana P2P Exchange Illustration">
+        </div>
+    </section>
+
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <h2>How It Works</h2>
+                <p>Simple, secure, and efficient P2P exchange process</p>
+            </div>
+            <div class="steps">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">🔐</div>
+                    <h3 class="step-title">Connect Your Wallet</h3>
+                    <p class="step-description">Connect your preferred Solana wallet and complete verification to start trading on SolBridgeX.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">🔄</div>
+                    <h3 class="step-title">Host Encrypted Node</h3>
+                    <p class="step-description">INR clients can host a third-party encrypted node that facilitates automatic payouts for SOL transactions.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">💸</div>
+                    <h3 class="step-title">Exchange Currencies</h3>
+                    <p class="step-description">SOL clients send SOL to INR clients through the platform. The encrypted node verifies and processes the transaction.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-icon">✅</div>
+                    <h3 class="step-title">Automatic Payouts</h3>
+                    <p class="step-description">Once verified, the system automatically processes INR payouts to the recipient's account securely and efficiently.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Key Features</h2>
+                <p>Advanced technology for seamless P2P transactions</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Encrypted Node Hosting</h3>
+                    <p>Host third-party encrypted nodes that enable automatic and secure payouts between parties.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Lightning-Fast Transactions</h3>
+                    <p>Experience near-instant transactions with Solana's high-performance blockchain technology.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3 class="feature-title">Low Transaction Fees</h3>
+                    <p>Save money with minimal fees compared to traditional exchanges and banking systems.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3 class="feature-title">Multi-Layer Security</h3>
+                    <p>Advanced encryption, multi-signature wallets, and secure authentication protect your assets.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3 class="feature-title">Mobile Compatibility</h3>
+                    <p>Access your account and make transactions from any device with our responsive platform.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3 class="feature-title">Real-Time Tracking</h3>
+                    <p>Monitor your transactions in real-time with detailed status updates and notifications.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="benefits" id="benefits">
+        <div class="container benefits-container">
+            <div class="benefits-content">
+                <h2>Benefits for Both Parties</h2>
+                <p>Our P2P exchange platform offers unique advantages for both INR clients and SOL clients</p>
+                
+                <div class="benefits-list">
+                    <div class="benefit-item">
+                        <div class="benefit-icon">✓</div>
+                        <div>
+                            <h4>For INR Clients</h4>
+                            <p>Earn additional income by hosting encrypted nodes, access competitive exchange rates, and receive automatic payouts.</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">✓</div>
+                        <div>
+                            <h4>For SOL Clients</h4>
+                            <p>Convert SOL to INR at competitive rates, enjoy fast transaction processing, and benefit from lower fees.</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">✓</div>
+                        <div>
+                            <h4>Enhanced Privacy</h4>
+                            <p>Direct P2P transactions provide greater privacy compared to centralized exchanges.</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">✓</div>
+                        <div>
+                            <h4>No Intermediaries</h4>
+                            <p>Eliminate middlemen and reduce costs with direct peer-to-peer transactions.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="benefits-image">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDYwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHJlY3Qgd2lkdGg9IjYwMCIgaGVpZ2h0PSI0MDAiIHJ4PSIxNiIgZmlsbD0iIzBBMEExNCIvPgogIDxjaXJjbGUgY3g9IjE1MCIgY3k9IjIwMCIgcj0iODAiIGZpbGw9IiMxRTg4RTUiIGZpbGwtb3BhY2l0eT0iMC4yIi8+CiAgPGNpcmNsZSBjeD0iNDUwIiBjeT0iMjAwIiByPSI4MCIgZmlsbD0iI0ZGQzEwNyIgZmlsbC1vcGFjaXR5PSIwLjIiLz4KICA8cGF0aCBkPSJNMTUwIDEzMEMxMTEuMzQgMTMwIDgwIDE2MS4zNCA4MCAxOTlDODAgMjM4LjY2IDExMS4zNCAyNzAgMTUwIDI3MEMxODguNjYgMjcwIDIyMCAyMzguNjYgMjIwIDIwMEMyMjAgMTYxLjM0IDE4OC42NiAxMzAgMTUwIDEzMFpNMTYwIDIyMEgxNDBWMTgwSDE2MFYyMjBaTTE2MCAxNzBIMTQwVjE1MEgxNjBWMTcwWiIgZmlsbD0iIzFFODhFNSIvPgogIDxwYXRoIGQ9Ik00NTAgMTMwQzQxMS4zNCAxMzAgMzgwIDE2MS4zNCAzODAgMjAwQzM4MCAyMzguNjYgNDExLjM0IDI3MCA0NTAgMjcwQzQ4OC42NiAyNzAgNTIwIDIzOC42NiA1MjAgMjAwQzUyMCAxNjEuMzQgNDg4LjY2IDEzMCA0NTAgMTMwWk00NzAgMjIwSDQzMFYyMDBINDcwVjIyMFpNNDcwIDE5MEg0MzBWMTcwSDQ3MFYxOTBaTTQ3MCAxNjBINDMwVjE0MEg0NzBWMTYwWiIgZmlsbD0iI0ZGQzEwNyIvPgogIDxwYXRoIGQ9Ik0zMDAgMTUwTDIyMCAyMDBMMzAwIDI1MEwzODAgMjAwTDMwMCAxNTBaIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjYgNiIvPgogIDxwYXRoIGQ9Ik0yMjAgMjAwTDMwMCAyNTBMMzAwIDMwMEwyMjAgMjUwTDIyMCAyMDBaIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjYgNiIvPgogIDxwYXRoIGQ9Ik0zODAgMjAwTDMwMCAyNTBMMzAwIDMwMEwzODAgMjUwTDM4MCAyMDBaIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjYgNiIvPgogIDx0ZXh0IHg9IjE1MCIgeT0iMzMwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5JTlIgQ2xpZW50PC90ZXh0PgogIDx0ZXh0IHg9IjQ1MCIgeT0iMzMwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5TT0wgQ2xpZW50PC90ZXh0PgogIDx0ZXh0IHg9IjMwMCIgeT0iMzMwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FbmNyeXB0ZWQgTm9kZTwvdGV4dD4KPC9zdmc+Cg==" alt="P2P Exchange Benefits">
+            </div>
+        </div>
+    </section>
+
+    <section class="wallet-section" id="wallet-section">
+        <div class="container wallet-container">
+            <div class="wallet-content">
+                <h2>Supported Wallets</h2>
+                <p>SolBridgeX supports a wide range of Solana wallets for secure and convenient transactions. Connect your wallet to get started with trading.</p>
+                <button class="btn btn-primary" id="connect-wallet-section">Connect Wallet</button>
+            </div>
+            <div class="wallet-icons">
+                <div class="wallet-item" data-wallet="phantom">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjY0IiBjeT0iNjQiIHI9IjY0IiBmaWxsPSIjQUIyMkZGIi8+CjxwYXRoIGQ9Ik0xMDguOTMgNTguMDlDMTA3LjQ3IDU3LjA5IDEwNS43IDU2LjUgMTAzLjk3IDU2LjVIODhjOC42NCAwIDE1LjY3IC03LjAzIDE1LjY3IC0xNS42N2MwIC04LjY0IC03LjAzIC0xNS42NyAtMTUuNjcgLTE1LjY3aC0zLjQzYy0wLjc1IDAgLTEuMzQgLTAuNjEgLTEuMzQgLTEuMzVjMCAtMC4yNSAwLjA3IC0wLjUgMC4yIC0wLjdDODUuNDkgMTguNDcgODAgMTEuMjMgNzIuNiAxMS4yM2MtNS45NiAwIC0xMS4wMSAzLjg5IC0xMi43OCA5LjI3Yy0wLjE1IDAuNDYgLTAuNTkgMC43NyAtMS4wOCAwLjc3Yy0wLjExIDAgLTAuMjMgLTAuMDIgLTAuMzQgLTAuMDVhMTUuNjEgMTUuNjEgMCAwIDAgLTQuODggLTAuNzhjLTguNjQgMCAtMTUuNjcgNy4wMyAtMTUuNjcgMTUuNjhjMCAwLjU4IDAuMDQgMS4xNSAwLjEgMS43MWMwLjAzIDAuMzIgLTAuMDggMC42NCAtMC4zIDAuODhjLTAuMjIgMC4yMyAtMC41MiAwLjM3IC0wLjg0IDAuMzdjLTQuNDYgMC42IC03LjkgNC40NCAtNy45IDkuMDVjMCA1LjAzIDQuMDggOS4xMSA5LjEyIDkuMTFoMjUuNTRjLTguNjQgMCAtMTUuNjcgNy4wMyAtMTUuNjcgMTUuNjdjMCA4LjY0IDcuMDMgMTUuNjcgMTUuNjcgMTUuNjdoNDEuNmMwLjU5IDAgMS4xNyAtMC4wMyAxLjc0IC0wLjA5YzAuMTYgLTAuMDIgMC4zMyAtMC4wMyAwLjQ5IC0wLjAzYzEwLjA2IDAgMTguMjUgLTguMiAxOC4yNSAtMTguMjVjMCAtNy44NCAtNC45NiAtMTQuNSAtMTEuOTEgLTE3LjA5WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==" alt="Phantom Wallet">
+                    <p>Phantom</p>
+                </div>
+                <div class="wallet-item" data-wallet="solflare">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjY0IiBjeT0iNjQiIHI9IjY0IiBmaWxsPSIjRkY5NzREIi8+CjxwYXRoIGQ9Ik0xMDggNjQuMDAxQzEwOCA4OC44MTMgODguODEzIDEwOC4wMDEgNjQgMTA4LjAwMUMzOS4xODcgMTA4LjAwMSAyMCA4OC44MTMgMjAgNjQuMDAxQzIwIDM5LjE4OCAzOS4xODcgMjAuMDAxIDY0IDIwLjAwMUM4OC44MTMgMjAuMDAxIDEwOCAzOS4xODggMTA4IDY0LjAwMVoiIGZpbGw9InVybCgjcGFpbnQwX2xpbmVhcl8yMDIzXzc2NSkiLz4KPHBhdGggZD0iTTc1LjI2NSA1OS4zOUw1Mi43NzEgNzguNzM0QzUyLjMyNyA3OS4xMTIgNTIuMTM5IDc5LjY5OCA1Mi4yNjUgODAuMjQ5TDU1LjA2OCA5My4yMThDNTUuMjkgOTQuMTcgNTQuMzU2IDk0Ljk4IDUzLjQ3NSA5NC41OTRMNDIuNjcyIDg5LjExNkM0Mi4yNDQgODguOTA0IDQxLjcyOCA4OC45MDUgNDEuMzAxIDg5LjExOEwzMC41MDggOTQuNjA3QzI5LjYyOCA5NC45OTQgMjguNjk1IDk0LjE4NCAyOC45MTggOTMuMjMyTDMxLjczNiA4MC4yNTRDMzEuODYzIDc5LjcwMyAzMS42NzQgNzkuMTE2IDMxLjIzIDc4LjczOEw4LjczMyA1OS4zOUM3Ljk3NSA1OC43MjcgOC4zMjQgNTcuNTI2IDkuMzA5IDU3LjQwNUwyMi43NzYgNTUuOTU2QzIzLjMzNSA1NS44OTMgMjMuODExIDU1LjU1NiAyNC4wNDIgNTUuMDVMMzAuMjc3IDQyLjYxQzMwLjY5OSA0MS43NjEgMzEuODYzIDQxLjc2MSAzMi4yODUgNDIuNjFMMzguNTIgNTUuMDVDMzguNzUxIDU1LjU1NiAzOS4yMjcgNTUuODkzIDM5Ljc4NyA1NS45NTZMNTMuMjUzIDU3LjQwNUM1NC4yMzggNTcuNTI2IDU0LjU4OCA1OC43MjcgNTMuODMgNTkuMzlINzUuMjY1WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTc1LjI2NSA1OS4zOUw5Ny43NTkgNzguNzM0Qzk4LjIwNCA3OS4xMTIgOTguMzkyIDc5LjY5OCA5OC4yNjYgODAuMjQ5TDk1LjQ2MyA5My4yMThDOTUuMjQgOTQuMTcgOTYuMTc0IDk0Ljk4IDk3LjA1NSA5NC41OTRMMTA3Ljg1OCA4OS4xMTZDMTA4LjI4NiA4OC45MDQgMTA4LjgwMiA4OC45MDUgMTA5LjIzIDg5LjExOEwxMjAuMDIzIDk0LjYwN0MxMjAuOTAzIDk0Ljk5NCAxMjEuODM2IDk0LjE4NCAxMjEuNjEyIDkzLjIzMkwxMTguNzk0IDgwLjI1NEMxMTguNjY4IDc5LjcwMyAxMTguODU3IDc5LjExNiAxMTkuMzAxIDc4LjczOEwxNDEuNzk4IDU5LjM5QzE0Mi41NTYgNTguNzI3IDE0Mi4yMDYgNTcuNTI2IDE0MS4yMjEgNTcuNDA1TDEyNy43NTQgNTUuOTU2QzEyNy4xOTUgNTUuODkzIDEyNi43MTkgNTUuNTU2IDEyNi40ODggNTUuMDVMMTIwLjI1MyA0Mi42MUMxMTkuODMxIDQxLjc2MSAxMTguNjY3IDQxLjc2MSAxMTguMjQ1IDQyLjYxTDExMiA1NS4wNUMxMTEuNzY5IDU1LjU1NiAxMTEuMjkzIDU1Ljg5MyAxMTAuNzMzIDU1Ljk1Nkw5Ny4yNjcgNTcuNDA1Qzk2LjI4MiA1Ny41MjYgOTUuOTMzIDU4LjcyNyA5Ni42OSA1OS4zOUg3NS4yNjVaIiBmaWxsPSJ3aGl0ZSIvPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJwYWludDBfbGluZWFyXzIwMjNfNzY1IiB4MT0iODkuNzczNSIgeTE9IjMzLjQ3MDYiIHgyPSI4OS43NzM1IiB5Mj0iOTQuNTMwMyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjRkZDMTA3Ii8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0Y1N0MwMCIvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjwvc3ZnPgo=" alt="Solflare Wallet">
+                    <p>Solflare</p>
+                </div>
+                <div class="wallet-item" data-wallet="slope">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjY0IiBjeT0iNjQiIHI9IjY0IiBmaWxsPSIjNkU2NkZBIi8+CjxwYXRoIGQ9Ik05NS41MTI4IDc0LjM1NzFIODMuNDYyOEw3My44OTkyIDUzLjA5NDVMNTYuMTUwNiA5MS43MTUySDE5Ljg5OTJMNTAuMzAxOCAzMkg3MS4yODIxTDk1Lj">
+                    <p>Slope</p>
+                </div>
+                <div class="wallet-item" data-wallet="backpack">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjY0IiBjeT0iNjQiIHI9IjY0IiBmaWxsPSIjMjIyMjIyIi8+CjxyZWN0IHg9IjI0IiB5PSIzMiIgd2lkdGg9IjgwIiBoZWlnaHQ9IjY0IiByeD0iOCIgZmlsbD0iIzEzQUFGRiIvPgo8cGF0aCBkPSJNMzIgNDhINDhWODBIMzJWNDhaIiBmaWxsPSIjMjIyMjIyIi8+CjxwYXRoIGQ9Ik04MCA0OEg5NlY4MEg4MFY0OFoiIGZpbGw9IiMyMjIyMjIiLz4KPHBhdGggZD0iTTU2IDgwSDcyVjk2SDU2Vjk2WiIgZmlsbD0iIzIyMjIyMiIvPgo8L3N2Zz4K" alt="Backpack Wallet">
+                    <p>Backpack</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Start Trading?</h2>
+                <p>Join thousands of users already benefiting from our secure P2P exchange platform. Connect your wallet today and experience the future of INR-SOL transactions.</p>
+                <div class="cta-form">
+                    <input type="email" placeholder="Enter your email for updates">
+                    <button type="submit">Stay Updated</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-about">
+                    <a href="#" class="footer-logo">
+                        <div class="logo-icon">S</div>
+                        Sol<span>BridgeX</span>
+                    </a>
+                    <p>The most secure and efficient P2P platform for exchanging INR and SOL with encrypted node hosting for automatic payouts.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M23 3.01006C22.0424 3.68553 20.9821 4.20217 19.86 4.54006C19.2577 3.84757 18.4573 3.35675 17.567 3.13398C16.6767 2.91122 15.7395 2.96725 14.8821 3.29451C14.0247 3.62177 13.2884 4.20446 12.773 4.96377C12.2575 5.72309 11.9877 6.62239 12 7.54006V8.54006C10.2426 8.58562 8.50127 8.19587 6.93101 7.4055C5.36074 6.61513 4.01032 5.44869 3 4.01006C3 4.01006 -1 13.0101 8 17.0101C5.94053 18.408 3.48716 19.109 1 19.0101C10 24.0101 21 19.0101 21 7.51006C20.9991 7.23151 20.9723 6.95365 20.92 6.68006C21.9406 5.67355 22.6608 4.40277 23 3.01006Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M16 8C17.5913 8 19.1174 8.63214 20.2426 9.75736C21.3679 10.8826 22 12.4087 22 14V21H18V14C18 13.4696 17.7893 12.9609 17.4142 12.5858C17.0391 12.2107 16.5304 12 16 12C15.4696 12 14.9609 12.2107 14.5858 12.5858C14.2107 12.9609 14 13.4696 14 14V21H10V14C10 12.4087 10.6321 10.8826 11.7574 9.75736C12.8826 8.63214 14.4087 8 16 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M6 9H2V21H6V9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M4 6C5.10457 6 6 5.10457 6 4C6 2.89543 5.10457 2 4 2C2.89543 2 2 2.89543 2 4C2 5.10457 2.89543 6 4 6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 2H15C13.6739 2 12.4021 2.52678 11.4645 3.46447C10.5268 4.40215 10 5.67392 10 7V10H7V14H10V22H14V14H17L18 10H14V7C14 6.73478 14.1054 6.48043 14.2929 6.29289C14.4804 6.10536 14.7348 6 15 6H18V2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22.54 6.42C22.4212 5.94541 22.1793 5.51057 21.8387 5.15941C21.498 4.80824 21.0708 4.55318 20.6 4.42C18.88 4 12 4 12 4C12 4 5.12 4 3.4 4.46C2.92925 4.59318 2.50198 4.84824 2.16135 5.19941C1.82072 5.55057 1.57879 5.98541 1.46 6.46C1.14521 8.20556 0.991235 9.97631 1 11.75C0.988687 13.537 1.14266 15.3213 1.46 17.08C1.59096 17.5398 1.83831 17.9581 2.17814 18.2945C2.51798 18.6308 2.93882 18.8738 3.4 19C5.12 19.46 12 19.46 12 19.46C12 19.46 18.88 19.46 20.6 19C21.0708 18.8668 21.498 18.6118 21.8387 18.2606C22.1793 17.9094 22.4212 17.4746 22.54 17C22.8524 15.2676 23.0063 13.5103 23 11.75C23.0113 9.96295 22.8573 8.1787 22.54 6.42Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M9.75 15.02L15.5 11.75L9.75 8.48001V15.02Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Team</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Press</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Products</h4>
+                    <ul>
+                        <li><a href="#">P2P Exchange</a></li>
+                        <li><a href="#">Node Hosting</a></li>
+                        <li><a href="#">API Access</a></li>
+                        <li><a href="#">Mobile App</a></li>
+                        <li><a href="#">Enterprise Solutions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Community</a></li>
+                        <li><a href="#">Security</a></li>
+                        <li><a href="#">Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Compliance</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 SolBridgeX. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Wallet Connect Modal -->
+    <div class="wallet-modal" id="wallet-modal">
+        <div class="wallet-modal-content">
+            <div class="wallet-modal-header">
+                <h3 class="wallet-modal-title">Connect Your Wallet</h3>
+                <button class="wallet-modal-close" id="close-modal">✕</button>
+            </div>
+            <div class="wallet-list">
+                <div class="wallet-option" data-wallet="phantom">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjY0IiBjeT0iNjQiIHI9IjY0IiBmaWxsPSIjQUIyMkZGIi8+CjxwYXRoIGQ9Ik0xMDguOTMgNTguMDlDMTA3LjQ3IDU3LjA5IDEwNS43IDU2LjUgMTAzLjk3IDU2LjVIODhjOC42NCAwIDE1LjY3IC03LjAzIDE1LjY3IC0xNS42N2MwIC04LjY0IC03LjAzIC0xNS42NyAtMTUuNjcgLTE1LjY3aC0zLjQzYy0wLjc1IDAgLTEuMzQgLTAuNjEgLTEuMzQgLTEuMzVjMCAtMC4yNSAwLjA3IC0wLjUgMC4yIC0wLjdDODUuNDkgMTguNDcgODAgMTEuMjMgNzIuNiAxMS4yM2MtNS45NiAwIC0xMS4wMSAzLjg5IC0xMi43OCA5LjI3Yy0wLjE1IDAuNDYgLTAuNTkgMC43NyAtMS4wOCAwLjc3Yy0wLjExIDAgLTAuMjMgLTAuMDIgLTAuMzQgLTAuMDVhMTUuNjEgMTUuNjEgMCAwIDAgLTQuODggLTAuNzhjLTguNjQgMCAtMTUuNjcgNy4wMyAtMTUuNjcgMTUuNjhjMCAwLjU4IDAuMDQgMS4xNSAwLjEgMS43MWMwLjAzIDAuMzIgLTAuMDggMC42NCAtMC4zIDAuODhjLTAuMjIgMC4yMyAtMC41MiAwLjM3IC0wLjg0IDAuMzdjLTQuNDYgMC42IC03LjkgNC40NCAtNy45IDkuMDVjMCA1LjAzIDQuMDggOS4xMSA5LjEyIDkuMTFoMjUuNTRjLTguNjQgMCAtMTUuNjcgNy4wMyAtMTUuNjcgMTUuNjdjMCA4LjY0IDcuMDMgMTUuNjcgMTUuNjcgMTUuNjdoNDEuNmMwLjU5IDAgMS4xNyAtMC4wMyAxLjc0IC0wLjA5YzAuMTYgLTAuMDIgMC4zMyAtMC4wMyAwLjQ5IC0wLjAzYzEwLjA2IDAgMTguMjUgLTguMiAxOC4yNSAtMTguMjVjMCAtNy44NCAtNC45NiAtMTQuNSAtMTEuOTEgLTE3LjA5WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==" alt="Phantom">
+                    <div class="wallet-option-info">
+                        <div class="wallet-option-name">Phantom</div>
+                        <div class="wallet-option-description">Connect to your Phantom Wallet</div>
+                    </div>
+                </div>
+                <div class="wallet-option" data-wallet="solflare">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjY0IiBjeT0iNjQiIHI9IjY0IiBmaWxsPSIjRkY5NzREIi8+CjxwYXRoIGQ9Ik0xMDggNjQuMDAxQzEwOCA4OC44MTMgODguODEzIDEwOC4wMDEgNjQgMTA4LjAwMUMzOS4xODcgMTA4LjAwMSAyMCA4OC44MTMgMjAgNjQuMDAxQzIwIDM5LjE4OCAzOS4xODcgMjAuMDAxIDY0IDIwLjAwMUM4OC44MTMgMjAuMDAxIDEwOCAzOS4xODggMTA4IDY0LjAwMVoiIGZpbGw9InVybCgjcGFpbnQwX2xpbmVhcl8yMDIzXzc2NSkiLz4KPHBhdGggZD0iTTc1LjI2NSA1OS4zOUw1Mi43NzEgNzguNzM0QzUyLjMyNyA3OS4xMTIgNTIuMTM5IDc5LjY5OCA1Mi4yNjUgODAuMjQ5TDU1LjA2OCA5My4yMThDNTUuMjkgOTQuMTcgNTQuMzU2IDk0Ljk4IDUzLjQ3NSA5NC41OTRMNDIuNjcyIDg5LjExNkM0Mi4yNDQgODguOTA0IDQxLjcyOCA4OC45MDUgNDEuMzAxIDg5LjExOEwzMC41MDggOTQuNjA3QzI5LjYyOCA5NC45OTQgMjguNjk1IDk0LjE4NCAyOC45MTggOTMuMjMyTDMxLjczNiA4MC4yNTRDMzEuODYzIDc5LjcwMyAzMS42NzQgNzkuMTE2IDMxLjIzIDc4LjczOEw4LjczMyA1OS4zOUM3Ljk3NSA1OC43MjcgOC4zMjQgNTcuNTI2IDkuMzA5IDU3LjQwNUwyMi43NzYgNTUuOTU2QzIzLjMzNSA1NS44OTMgMjMuODExIDU1LjU1NiAyNC4wNDIgNTUuMDVMMzAuMjc3IDQyLjYxQzMwLjY5OSA0MS43NjEgMzEuODYzIDQxLjc2MSAzMi4yODUgNDIuNjFMMzguNTIgNTUuMDVDMzguNzUxIDU1LjU1NiAzOS4yMjcgNTUuODkzIDM5Ljc4NyA1NS45NTZMNTMuMjUzIDU3LjQwNUM1NC4yMzggNTcuNTI2IDU0LjU4OCA1OC43MjcgNTMuODMgNTkuMzlINzUuMjY1WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTc1LjI2NSA1OS4zOUw5Ny43NTkgNzguNzM0Qzk4LjIwNCA3OS4xMTIgOTguMzkyIDc5LjY5OCA5OC4yNjYgODAuMjQ5TDk1LjQ2MyA5My4yMThDOTUuMjQgOTQuMTcgOTYuMTc0IDk0Ljk4IDk3LjA1NSA5NC41OTRMMTA3Ljg1OCA4OS4xMTZDMTA4LjI4NiA4OC45MDQgMTA4LjgwMiA4OC45MDUgMTA5LjIzIDg5LjExOEwxMjAuMDIzIDk0LjYwN0MxMjAuOTAzIDk0Ljk5NCAxMjEuODM2IDk0LjE4NCAxMjEuNjEyIDkzLjIzMkwxMTguNzk0IDgwLjI1NEMxMTguNjY4IDc5LjcwMyAxMTguODU3IDc5LjExNiAxMTkuMzAxIDc4LjczOEwxNDEuNzk4IDU5LjM5QzE0Mi41NTYgNTguNzI3IDE0Mi4yMDYgNTcuNTI2IDE0MS4yMjEgNTcuNDA1TDEyNy43NTQgNTUuOTU2QzEyNy4xOTUgNTUuODkzIDEyNi43MTkgNTUuNTU2IDEyNi40ODggNTUuMDVMMTIwLjI1MyA0Mi42MUMxMTkuODMxIDQxLjc2MSAxMTguNjY3IDQxLjc2MSAxMTguMjQ1IDQyLjYxTDExMiA1NS4wNUMxMTEuNzY5IDU1LjU1NiAxMTEuMjkzIDU1Ljg5MyAxMTAuNzMzIDU1Ljk1Nkw5Ny4yNjcgNTcuNDA1Qzk2LjI4MiA1Ny41MjYgOTUuOTMzIDU4LjcyNyA5Ni42OSA1OS4zOUg3NS4yNjVaIiBmaWxsPSJ3aGl0ZSIvPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJwYWludDBfbGluZWFyXzIwMjNfNzY1IiB4MT0iODkuNzczNSIgeTE9IjMzLjQ3MDYiIHgyPSI4OS43NzM1IiB5Mj0iOTQuNTMwMyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjRkZDMTA3Ii8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0Y1N0MwMCIvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjwvc3ZnPgo=" alt="Solflare">
+                    <div class="wallet-option-info">
+                        <div class="wallet-option-name">Solflare</div>
+                        <div class="wallet-option-description">Connect to your Solflare Wallet</div>
+                    </div>
+                </div>
+                <div class="wallet-option" data-wallet="slope">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjY0IiBjeT0iNjQiIHI9IjY0IiBmaWxsPSIjNkU2NkZBIi8+CjxwYXRoIGQ9Ik05NS41MTI4IDc0LjM1NzFIODMuNDYyOEw3My44OTkyIDUzLjA5NDVMNTYuMTUwNiA5MS43MTUySDE5Ljg5OTJMNTAuMzAxOCAzMkg3MS4yODIxTDk1LjUxMjggNzQuMzU3MVoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=" alt="Slope">
+                    <div class="wallet-option-info">
+                        <div class="wallet-option-name">Slope</div>
+                        <div class="wallet-option-description">Connect to your Slope Wallet</div>
+                    </div>
+                </div>
+                <div class="wallet-option" data-wallet="backpack">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjY0IiBjeT0iNjQiIHI9IjY0IiBmaWxsPSIjMjIyMjIyIi8+CjxyZWN0IHg9IjI0IiB5PSIzMiIgd2lkdGg9IjgwIiBoZWlnaHQ9IjY0IiByeD0iOCIgZmlsbD0iIzEzQUFGRiIvPgo8cGF0aCBkPSJNMzIgNDhINDhWODBIMzJWNDhaIiBmaWxsPSIjMjIyMjIyIi8+CjxwYXRoIGQ9Ik04MCA0OEg5NlY4MEg4MFY0OFoiIGZpbGw9IiMyMjIyMjIiLz4KPHBhdGggZD0iTTU2IDgwSDcyVjk2SDU2Vjk2WiIgZmlsbD0iIzIyMjIyMiIvPgo8L3N2Zz4K" alt="Backpack">
+                    <div class="wallet-option-info">
+                        <div class="wallet-option-name">Backpack</div>
+                        <div class="wallet-option-description">Connect to your Backpack Wallet</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@latest/lib/index.iife.js"></script>
+<script>
+    // Header scroll effect
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+        header.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const nav = document.getElementById('nav');
+    mobileMenuBtn.addEventListener('click', () => {
+        nav.classList.toggle('active');
+        mobileMenuBtn.classList.toggle('active');
+        mobileMenuBtn.textContent = nav.classList.contains('active') ? '✕' : '☰';
+    });
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (this.getAttribute('href') === '#') return;
+            const targetElement = document.querySelector(this.getAttribute('href'));
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+                if (nav.classList.contains('active')) {
+                    nav.classList.remove('active');
+                    mobileMenuBtn.classList.remove('active');
+                    mobileMenuBtn.textContent = '☰';
+                }
+            }
+        });
+    });
+
+    // Wallet Modal
+    const walletModal = document.getElementById('wallet-modal');
+    const connectWalletBtns = document.querySelectorAll('#connect-wallet, #connect-wallet-hero, #connect-wallet-section');
+    const closeModalBtn = document.getElementById('close-modal');
+    const walletOptions = document.querySelectorAll('.wallet-option');
+    const walletItems = document.querySelectorAll('.wallet-item');
+
+    // Open wallet modal
+    connectWalletBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            walletModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+    });
+
+    // Close wallet modal
+    closeModalBtn.addEventListener('click', () => {
+        walletModal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    });
+
+    walletModal.addEventListener('click', (e) => {
+        if (e.target === walletModal) {
+            walletModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    // Wallet Connect Logic (Solana + Phantom)
+    walletOptions.forEach(option => {
+        option.addEventListener('click', async () => {
+            const walletName = option.getAttribute('data-wallet');
+
+            if (walletName === 'phantom') {
+                try {
+                    if (window.solana && window.solana.isPhantom) {
+                        const resp = await window.solana.connect();
+                        console.log('Connected to wallet:', resp.publicKey.toString());
+
+                        connectWalletBtns.forEach(btn => {
+                            btn.innerHTML = `<span class="wallet-icon">✓</span> Phantom Connected`;
+                            btn.classList.add('connected');
+                        });
+
+                        walletModal.classList.remove('active');
+                        document.body.style.overflow = 'auto';
+
+                        // Redirect
+                        window.location.href = '/dashboard';
+                    } else {
+                        alert("Phantom Wallet not found. Please install it from https://phantom.app/");
+                    }
+                } catch (err) {
+                    console.error("Wallet connection error:", err);
+                    alert("Failed to connect wallet.");
+                }
+            } else {
+                alert(`Wallet ${walletName} is not supported yet.`);
+            }
+        });
+    });
+
+    // Optional: Wallet items (duplicate behavior)
+    walletItems.forEach(item => {
+        item.addEventListener('click', async () => {
+            const walletName = item.getAttribute('data-wallet');
+
+            if (walletName === 'phantom') {
+                try {
+                    if (window.solana && window.solana.isPhantom) {
+                        const resp = await window.solana.connect();
+                        console.log('Connected to wallet:', resp.publicKey.toString());
+
+                        connectWalletBtns.forEach(btn => {
+                            btn.innerHTML = `<span class="wallet-icon">✓</span> Phantom Connected`;
+                            btn.classList.add('connected');
+                        });
+
+                        walletModal.classList.remove('active');
+                        document.body.style.overflow = 'auto';
+
+                        window.location.href = '/dashboard';
+                    } else {
+                        alert("Phantom Wallet not found. Please install it.");
+                    }
+                } catch (err) {
+                    console.error("Wallet connection error:", err);
+                    alert("Failed to connect wallet.");
+                }
+            }
+        });
+    });
+
+    // Scroll animations
+    const fadeElements = document.querySelectorAll('.step-card, .feature-card, .benefit-item');
+    const fadeInOnScroll = () => {
+        fadeElements.forEach(el => {
+            const elementTop = el.getBoundingClientRect().top;
+            if (elementTop < window.innerHeight - 150) {
+                el.classList.add('fade-in');
+                el.style.opacity = 1;
+                el.style.transform = 'translateY(0)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            }
+        });
+    };
+    window.addEventListener('scroll', fadeInOnScroll);
+    window.addEventListener('load', fadeInOnScroll);
+
+    // Particle animation
+    const particles = document.getElementById('particles');
+    const createParticle = () => {
+        const p = document.createElement('div');
+        p.classList.add('particle');
+        const size = Math.random() * 10 + 5;
+        p.style.width = `${size}px`;
+        p.style.height = `${size}px`;
+        p.style.left = `${Math.random() * window.innerWidth}px`;
+        p.style.top = `${Math.random() * window.innerHeight + window.innerHeight}px`;
+        p.style.opacity = Math.random() * 0.5 + 0.1;
+        const duration = Math.random() * 10 + 10;
+        const delay = Math.random() * 5;
+        p.style.animationDuration = `${duration}s`;
+        p.style.animationDelay = `${delay}s`;
+        particles.appendChild(p);
+        setTimeout(() => p.remove(), (duration + delay) * 1000);
+    };
+    for (let i = 0; i < 20; i++) createParticle();
+    setInterval(createParticle, 1000);
+</script>
+
+</body>
+</html>
